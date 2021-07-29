@@ -1,1 +1,1 @@
-# kubernetes_demo
+# docker-with-celery-redis-rabbitmq-flask
