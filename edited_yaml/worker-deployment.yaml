@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.22.0 (955b78124)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: worker
+  name: worker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: worker
+  strategy: {}
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert
+        kompose.version: 1.22.0 (955b78124)
+      creationTimestamp: null
+      labels:
+        io.kompose.service: worker
+    spec:
+      containers:
+        - command:
+            - celery
+            - -A
+            - tasks
+            - worker
+            - --loglevel=info
+          env:
+            - name: CELERY_BROKER_URL
+              value: amqp://guest:guest@rabbit:5672//
+            - name: CELERY_RESULT_BACKEND
+              value: redis://redis:6379/0
+          image: logeshkrishnan/worker_k8:latest
+          name: worker
+          imagePullSecrets: gitlab-auth
+          resources: {}
+      restartPolicy: Always
+status: {}

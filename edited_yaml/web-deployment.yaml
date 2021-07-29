@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.22.0 (955b78124)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: web
+  name: web
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: web
+  strategy: {}
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert
+        kompose.version: 1.22.0 (955b78124)
+      creationTimestamp: null
+      labels:
+        io.kompose.service: web
+    spec:
+      containers:
+        - args:
+            - gunicorn
+            - --bind
+            - 0.0.0.0:5001
+            - app:flask_app
+          env:
+            - name: CELERY_BROKER_URL
+              value: amqp://guest:guest@rabbit:5672//
+            - name: CELERY_RESULT_BACKEND
+              value: redis://redis:6379/0
+            - name: C_FORCE_ROOT
+              value: "true"
+            - name: DEBUG
+              value: "true"
+            - name: HOST
+              value: 0.0.0.0
+            - name: PORT
+              value: "5001"
+          image: logeshkrishnan/flask_k8:latest
+          name: web
+          ports:
+            - containerPort: 5001
+          resources: {}
+      restartPolicy: Always
+status: {}
